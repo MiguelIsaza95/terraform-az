@@ -10,9 +10,9 @@ resource "azurerm_resource_group" "web_server_rg" {
     environment = local.build_environment
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 resource "azurerm_virtual_network" "web_server_vnet" {
