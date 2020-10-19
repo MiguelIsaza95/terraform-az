@@ -1,37 +1,30 @@
-#Autosacling group, private instances, we need a bastion to connect to this instances
-resource "azurerm_virtual_machine_scale_set" "web_server" {
-  name                = "${var.resource_group}-scale-set"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.web_server_rg.name
-  upgrade_policy_mode = "manual"
-
-  sku {
-    name     = "Standard_B1s"
-    tier     = "Standard"
-    capacity = var.win_count
-  }
-  storage_profile_image_reference {
+#Autosacling group, private instances, set env var ARM_PROVIDER_VMSS_EXTENSIONS_BETA=true
+resource "azurerm_windows_virtual_machine_scale_set" "web_server" {
+  name                 = "${var.resource_group}-scale-set"
+  location             = var.location
+  resource_group_name  = azurerm_resource_group.web_server_rg.name
+  upgrade_mode         = "Manual"
+  admin_username       = "webserver"
+  admin_password       = data.azurerm_key_vault_secret.admin_password.value
+  computer_name_prefix = local.web_server_name
+  sku                  = "Standard_B1s"
+  instances            = var.win_count
+  provision_vm_agent   = true
+  source_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
     sku       = "2016-Datacenter"
     version   = "latest"
   }
-  os_profile {
-    computer_name_prefix = local.web_server_name
-    admin_username       = "webserver"
-    admin_password       = data.azurerm_key_vault_secret.admin_password.value
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
   }
-  storage_profile_os_disk {
-    name              = ""
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-  os_profile_windows_config {
-    provision_vm_agent        = true
-    enable_automatic_upgrades = true
-  }
-  network_profile {
+  # automatic_os_upgrade_policy {
+  #   disable_automatic_rollback = false
+  #   enable_automatic_os_upgrade = true
+  # }
+  network_interface {
     name    = "we_server_network_profile"
     primary = true
     ip_configuration {
@@ -122,5 +115,63 @@ resource "azurerm_lb_rule" "web_server_lb_http_rule" {
 #     offer     = "WindowsServer"
 #     sku       = "2016-Datacenter"
 #     version   = "latest"
+#   }
+# }
+
+# #Autosacling group, private instances, we need a bastion to connect to this instances
+# resource "azurerm_virtual_machine_scale_set" "web_server" {
+#   name                = "${var.resource_group}-scale-set"
+#   location            = var.location
+#   resource_group_name = azurerm_resource_group.web_server_rg.name
+#   upgrade_policy_mode = "manual"
+
+#   sku {
+#     name     = "Standard_B1s"
+#     tier     = "Standard"
+#     capacity = var.win_count
+#   }
+#   storage_profile_image_reference {
+#     publisher = "MicrosoftWindowsServer"
+#     offer     = "WindowsServer"
+#     sku       = "2016-Datacenter"
+#     version   = "latest"
+#   }
+#   os_profile {
+#     computer_name_prefix = local.web_server_name
+#     admin_username       = "webserver"
+#     admin_password       = data.azurerm_key_vault_secret.admin_password.value
+#   }
+#   storage_profile_os_disk {
+#     name              = ""
+#     caching           = "ReadWrite"
+#     create_option     = "FromImage"
+#     managed_disk_type = "Standard_LRS"
+#   }
+#   os_profile_windows_config {
+#     provision_vm_agent        = true
+#     enable_automatic_upgrades = true
+#   }
+#   network_profile {
+#     name    = "we_server_network_profile"
+#     primary = true
+#     ip_configuration {
+#       name                                   = local.web_server_name
+#       primary                                = true
+#       subnet_id                              = azurerm_subnet.web_server_subnet["web-server"].id
+#       load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.web_server_backend_pool.id]
+#     }
+#   }
+#   extension {
+#     name                 = "${local.web_server_name}-extension"
+#     publisher            = "Microsoft.Compute"
+#     type                 = "CustomScriptExtension"
+#     type_handler_version = "1.10"
+
+#     settings = <<SETTINGS
+#     {
+#       "fileUris" : ["https://raw.githubusercontent.com/eltimmo/learning/master/azureInstallWebServer.ps1"],
+#       "commandToExecute" : "start powershell -ExecutionPolicy Unrestricted -File azureInstallWebServer.ps1"
+#     }
+#     SETTINGS
 #   }
 # }
