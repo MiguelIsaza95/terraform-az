@@ -1,11 +1,11 @@
 resource "azurerm_network_security_group" "web_server_nsg" {
   name                = "${var.server_name}-nsg"
   location            = var.location
-  resource_group_name = azurerm_resource_group.web_server_sg.name
+  resource_group_name = azurerm_resource_group.web_server_rg.name
 }
 
 resource "azurerm_network_security_rule" "web_server_ng_rule_rdp" {
-  resource_group_name         = azurerm_resource_group.web_server_sg.name
+  resource_group_name         = azurerm_resource_group.web_server_rg.name
   network_security_group_name = azurerm_network_security_group.web_server_nsg.name
   name                        = "RDP inbound"
   priority                    = 100
@@ -14,6 +14,20 @@ resource "azurerm_network_security_rule" "web_server_ng_rule_rdp" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "3389"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+}
+
+resource "azurerm_network_security_rule" "web_server_ng_rule_http" {
+  resource_group_name         = azurerm_resource_group.web_server_rg.name
+  network_security_group_name = azurerm_network_security_group.web_server_nsg.name
+  name                        = "HTTP inbound"
+  priority                    = 110
+  direction                   = "inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "80"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
 }
