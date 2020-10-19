@@ -46,7 +46,7 @@ variable "subnets" {
   type        = map(string)
   description = "(optional) describe your variable"
   default = {
-    web-server = "10.0.16.0/20"
+    web-server         = "10.0.16.0/20"
     AzureBastionSubnet = "10.0.32.0/20"
   }
 }
