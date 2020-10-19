@@ -1,4 +1,5 @@
 variable "bastion_rg" {
+  default = "bastion-rg"
   type = string
 }
 

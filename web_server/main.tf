@@ -23,8 +23,7 @@ resource "azurerm_virtual_network" "web_server_vnet" {
 }
 
 module "bastion_host" {
-  source = "./modules/bastion"
-  name = var.bastion_rg
-  location = var.location
-  subnet_id =  azurerm_subnet.web_server_subnet["az-bastion"].id
+  source    = "./modules/bastion"
+  location  = var.location
+  subnet_id = azurerm_subnet.web_server_subnet["AzureBastionSubnet"].id
 }

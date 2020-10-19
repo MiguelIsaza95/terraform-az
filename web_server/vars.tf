@@ -47,7 +47,7 @@ variable "subnets" {
   description = "(optional) describe your variable"
   default = {
     web-server = "10.0.16.0/20"
-    az-bastion = "10.0.32.0/20"
+    AzureBastionSubnet = "10.0.32.0/20"
   }
 }
 variable "win_count" {
@@ -57,17 +57,3 @@ variable "win_count" {
 # Export variable TF_VARS_*
 variable "client_id" {}
 variable "client_secret" {}
-
-# Bastion module vars
-variable "bastion_rg" {
-  type = string
-}
-
-variable "location" {
-  type = string
-}
-
-variable "subnet_id" {
-  type = string
-  description = "(optional) describe your variable"
-}

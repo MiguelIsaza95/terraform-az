@@ -1,8 +1,3 @@
-provider "azurerm" {
-  version = "2.2.0"
-  features {}
-}
-
 resource "azurerm_resource_group" "bastion_rg" {
   name     = var.bastion_rg
   location = var.location
